@@ -1,11 +1,11 @@
 ---
 name: smart-compact
-description: "Smart context compaction for OpenClaw agents. Inspired by Claude Code's 3-phase compaction strategy (Micro → Standard → Session Memory). Before running /compact, this skill scans tool outputs, extracts valuable information into memory files, and generates a pre-compact checklist — ensuring nothing important is lost during compression. Triggers: smart-compact, 智能压缩, pre-compact, 压缩检查, compact check. Can also run automatically before each /compact."
+description: "Smart context compaction for OpenClaw agents. 4-phase progressive strategy: Scan → Extract → Check → Compact. Before running /compact, this skill scans tool outputs, extracts valuable information into memory files, and generates a pre-compact checklist — ensuring nothing important is lost during compression. Triggers: smart-compact, 智能压缩, pre-compact, 压缩检查, compact check. Can also run automatically before each /compact."
 ---
 
 # Smart Compact — 智能压缩增强
 
-灵感来源：Claude Code 源码中的三阶段压缩策略（Micro Compact → Standard Compact → Session Memory Compact）。
+四阶段渐进式压缩策略（Scan → Extract → Check → Compact），在 /compact 前先把重要信息救出来。
 
 ## 什么时候用
 
@@ -16,13 +16,16 @@ description: "Smart context compaction for OpenClaw agents. Inspired by Claude C
 
 ## 核心理念
 
-Claude Code 的压缩不是一股脑全压，而是**分三步走**：
+传统的上下文压缩是一刀切——整个对话被浓缩成一段摘要，大量细节在过程中丢失。
 
-1. **Micro Compact**：只压缩工具输出（最省 token 的方式）
-2. **Standard Compact**：压缩整个对话历史
-3. **Session Memory Compact**：压缩时自动提取记忆
+Smart Compact 采用**四阶段渐进式**策略，在 /compact 之前插入一个"预处理"阶段：
 
-OpenClaw 原生的 /compact 是一步到位的，会丢失细节。Smart Compact 在 /compact 之前插入一个"预处理"阶段，**先救再压**。
+1. **扫描**：识别对话中的大块工具输出和关键信息
+2. **提取**：把值得保留的信息写入记忆文件
+3. **检查**：生成压缩前检查清单，标记风险项
+4. **压缩**：用户确认安全后才执行压缩
+
+核心原则：**先救再压**，宁可多存也不能漏存。
 
 ## 执行流程
 
