@@ -8,11 +8,11 @@
 
 ### 这是什么？
 
-AI Agent 对话越长，上下文越大，token 消耗越快。压缩上下文是必须的，但 OpenClaw 原生的 `/compact` 是一步到位的压缩——整个对话被浓缩成一段摘要，过程中**大量细节会丢失**。
+AI Agent 对话越长，上下文越大，上下文越容易溢出。压缩上下文是必须的，但 OpenClaw 原生的 `/compact` 是一步到位的压缩——整个对话被浓缩成一段摘要，过程中**大量细节会丢失**。
 
 你有没有遇到过这些情况？
-- Agent 压缩后忘了刚才调试好的 API 端点
-- 配置文件的路径、IP、端口信息全部丢失
+- Agent 压缩后忘了刚才调试好的 服务接口
+- 配置文件的路径、地址、端口信息全部丢失
 - 之前踩过的坑，压缩后又要重新踩一遍
 - 做了某个决策，压缩后连原因都想不起来了
 
@@ -76,7 +76,7 @@ openclaw gateway restart
 回顾当前对话中所有的工具调用结果（`exec`、`read`、`web_fetch`、`web_search` 等），识别：
 
 - **大块输出**：超过 50 行或 2000 字符的工具结果
-- **关键信息**：配置值、IP 地址、API 端点、文件路径、认证信息
+- **关键信息**：配置值、网络地址、服务接口、文件路径、登录信息
 - **引用状态**：该信息是否已被后续对话引用或总结过
 - **冗余判断**：是否是重复的 `ls`、`git status` 等输出
 
@@ -84,7 +84,7 @@ openclaw gateway restart
 
 从工具输出和对话中提取值得持久化的信息，分类写入 `memory/YYYY-MM-DD.md`：
 
-- 🔵 **新事实**：IP 地址、端口号、文件路径、API 端点
+- 🔵 **新事实**：网络地址、端口、文件路径、服务接口
 - 🟡 **决策记录**：为什么选了方案 A 而不是 B，以及原因
 - 🔴 **踩坑记录**：错误信息和对应的解决方案
 - 🟢 **用户偏好**：用户明确表达的喜好或要求
@@ -93,7 +93,7 @@ openclaw gateway restart
 写入规则：
 - 只使用**追加模式**，绝不覆盖已有内容
 - 每条记忆附带简短的来源说明
-- 敏感信息（如 认证令牌）会脱敏处理
+- 私密数据（如 登录凭据）会脱敏处理
 
 #### 阶段三：检查（Check）
 
@@ -116,7 +116,7 @@ openclaw gateway restart
 （共 3 条写入 memory/2026-04-02.md）
 
 ⚠️ 需要注意：
-- [!] exec 输出包含 API 响应但尚未被引用
+- [!] exec 输出包含 服务响应但尚未被引用
 
 ✅ 建议：可以安全执行 /compact
 ```
@@ -136,14 +136,14 @@ openclaw gateway restart
 | 📝 追加写入 | 只追加记忆文件，绝不覆盖已有内容 |
 | 🔒 不自动压缩 | 必须用户确认才执行压缩操作 |
 | 👁️ 透明可控 | 每一步操作都有详细报告和统计 |
-| 🔑 安全优先 | 敏感信息脱敏，绝不泄露认证信息 |
+| 🔑 安全优先 | 私密数据脱敏，绝不泄露登录信息 |
 | ♻️ 幂等设计 | 重复执行不会产生副作用 |
 
 ### 信息分类标准
 
 | 类别 | 处理方式 | 示例 |
 |------|----------|------|
-| 🔴 必须保存 | 写入记忆 | 认证令牌、IP 地址、配置值、错误解决方案 |
+| 🔴 必须保存 | 写入记忆 | 登录凭据、网络地址、配置值、错误解决方案 |
 | 🟡 建议保存 | 写入记忆 | 决策原因、用户偏好、任务进度 |
 | 🟢 可以丢弃 | 标记安全 | 重复的 ls 输出、已被总结的搜索结果 |
 
@@ -181,10 +181,10 @@ Smart Compact 和 [Memory-Dream](https://github.com/wavmson/openclaw-skill-memor
 
 ### What is this?
 
-As AI Agent conversations grow longer, context windows fill up and token costs skyrocket. Context compaction is essential, but OpenClaw's native `/compact` compresses everything at once — **valuable details get lost** in the process.
+As AI Agent conversations grow longer, context windows fill up and context usage grows fast. Context compaction is essential, but OpenClaw's native `/compact` compresses everything at once — **valuable details get lost** in the process.
 
 Have you ever experienced these frustrations?
-- Agent forgot the API endpoint you just debugged after compaction
+- Agent forgot the service endpoint you just debugged after compaction
 - Config file paths, IPs, and port numbers all vanished
 - A bug you already solved? Agent hits the same wall again
 - Made a decision for good reasons? After compaction, the reasons are gone
@@ -249,7 +249,7 @@ Say any of these trigger phrases to your agent:
 Reviews all tool call results in the current conversation (`exec`, `read`, `web_fetch`, `web_search`, etc.) and identifies:
 
 - **Large outputs**: Tool results exceeding 50 lines or 2000 characters
-- **Key information**: Config values, IP addresses, API endpoints, file paths, auth tokens
+- **Important data**: Config values, network addresses, service endpoints, file paths, access details
 - **Reference status**: Whether the info has been referenced or summarized later in conversation
 - **Redundancy**: Repeated `ls`, `git status`, or similar outputs
 
@@ -257,7 +257,7 @@ Reviews all tool call results in the current conversation (`exec`, `read`, `web_
 
 Extracts durable information from tool outputs and conversation, categorized and written to `memory/YYYY-MM-DD.md`:
 
-- 🔵 **New facts**: IP addresses, ports, file paths, API endpoints
+- 🔵 **New facts**: network addresses, ports, file paths, service endpoints
 - 🟡 **Decision records**: Why option A was chosen over B, with reasoning
 - 🔴 **Error solutions**: Error messages and their fixes
 - 🟢 **User preferences**: Explicitly stated likes or requirements
@@ -266,7 +266,7 @@ Extracts durable information from tool outputs and conversation, categorized and
 Writing rules:
 - **Append-only** — never overwrites existing content
 - Each memory includes a brief source note
-- Sensitive info (认证令牌s) is redacted
+- Sensitive info (登录凭据s) is redacted
 
 #### Phase 3: Check
 
@@ -289,7 +289,7 @@ Generates a structured pre-compact checklist:
 (3 items written to memory/2026-04-02.md)
 
 ⚠️ Attention:
-- [!] exec output contains API response not yet referenced
+- [!] exec output contains service response not yet referenced
 
 ✅ Recommendation: Safe to execute /compact
 ```
@@ -309,14 +309,14 @@ Generates a structured pre-compact checklist:
 | 📝 Append-only | Never overwrites existing memory content |
 | 🔒 No auto-compact | Requires explicit user confirmation |
 | 👁️ Full transparency | Detailed reports and stats at every step |
-| 🔑 Security first | Sensitive info is redacted, auth info never leaked |
+| 🔑 Security first | Sensitive info is redacted, access details never leaked |
 | ♻️ Idempotent | Running twice produces no side effects |
 
 ### Information Classification
 
 | Category | Action | Examples |
 |----------|--------|----------|
-| 🔴 Must save | Write to memory | 认证令牌s, IPs, config values, error solutions |
+| 🔴 Must save | Write to memory | 登录凭据s, IPs, config values, error solutions |
 | 🟡 Should save | Write to memory | Decision reasons, user preferences, task progress |
 | 🟢 Safe to discard | Mark as safe | Repeated ls output, already-summarized search results |
 
