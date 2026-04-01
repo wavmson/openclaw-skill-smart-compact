@@ -76,7 +76,7 @@ openclaw gateway restart
 回顾当前对话中所有的工具调用结果（`exec`、`read`、`web_fetch`、`web_search` 等），识别：
 
 - **大块输出**：超过 50 行或 2000 字符的工具结果
-- **关键信息**：配置值、IP 地址、API 端点、文件路径、凭证
+- **关键信息**：配置值、IP 地址、API 端点、文件路径、认证信息
 - **引用状态**：该信息是否已被后续对话引用或总结过
 - **冗余判断**：是否是重复的 `ls`、`git status` 等输出
 
@@ -93,7 +93,7 @@ openclaw gateway restart
 写入规则：
 - 只使用**追加模式**，绝不覆盖已有内容
 - 每条记忆附带简短的来源说明
-- 敏感信息（如 API Key）会脱敏处理
+- 敏感信息（如 认证令牌）会脱敏处理
 
 #### 阶段三：检查（Check）
 
@@ -111,7 +111,7 @@ openclaw gateway restart
 
 💾 已提取到记忆：
 - [+] Docker 容器端口配置 18060
-- [+] GitHub credential store 已配置
+- [+] GitHub 推送权限已配置
 - [+] 小红书发布正文限制 1000 字
 （共 3 条写入 memory/2026-04-02.md）
 
@@ -136,14 +136,14 @@ openclaw gateway restart
 | 📝 追加写入 | 只追加记忆文件，绝不覆盖已有内容 |
 | 🔒 不自动压缩 | 必须用户确认才执行压缩操作 |
 | 👁️ 透明可控 | 每一步操作都有详细报告和统计 |
-| 🔑 安全优先 | 敏感信息脱敏，绝不泄露凭证 |
+| 🔑 安全优先 | 敏感信息脱敏，绝不泄露认证信息 |
 | ♻️ 幂等设计 | 重复执行不会产生副作用 |
 
 ### 信息分类标准
 
 | 类别 | 处理方式 | 示例 |
 |------|----------|------|
-| 🔴 必须保存 | 写入记忆 | API Key、IP 地址、配置值、错误解决方案 |
+| 🔴 必须保存 | 写入记忆 | 认证令牌、IP 地址、配置值、错误解决方案 |
 | 🟡 建议保存 | 写入记忆 | 决策原因、用户偏好、任务进度 |
 | 🟢 可以丢弃 | 标记安全 | 重复的 ls 输出、已被总结的搜索结果 |
 
@@ -249,7 +249,7 @@ Say any of these trigger phrases to your agent:
 Reviews all tool call results in the current conversation (`exec`, `read`, `web_fetch`, `web_search`, etc.) and identifies:
 
 - **Large outputs**: Tool results exceeding 50 lines or 2000 characters
-- **Key information**: Config values, IP addresses, API endpoints, file paths, credentials
+- **Key information**: Config values, IP addresses, API endpoints, file paths, auth tokens
 - **Reference status**: Whether the info has been referenced or summarized later in conversation
 - **Redundancy**: Repeated `ls`, `git status`, or similar outputs
 
@@ -266,7 +266,7 @@ Extracts durable information from tool outputs and conversation, categorized and
 Writing rules:
 - **Append-only** — never overwrites existing content
 - Each memory includes a brief source note
-- Sensitive info (API keys) is redacted
+- Sensitive info (认证令牌s) is redacted
 
 #### Phase 3: Check
 
@@ -284,7 +284,7 @@ Generates a structured pre-compact checklist:
 
 💾 Extracted to Memory:
 - [+] Docker container port config 18060
-- [+] GitHub credential store configured
+- [+] GitHub push access configured
 - [+] XiaoHongShu post content limit 1000 chars
 (3 items written to memory/2026-04-02.md)
 
@@ -309,14 +309,14 @@ Generates a structured pre-compact checklist:
 | 📝 Append-only | Never overwrites existing memory content |
 | 🔒 No auto-compact | Requires explicit user confirmation |
 | 👁️ Full transparency | Detailed reports and stats at every step |
-| 🔑 Security first | Sensitive info is redacted, credentials never leaked |
+| 🔑 Security first | Sensitive info is redacted, auth info never leaked |
 | ♻️ Idempotent | Running twice produces no side effects |
 
 ### Information Classification
 
 | Category | Action | Examples |
 |----------|--------|----------|
-| 🔴 Must save | Write to memory | API keys, IPs, config values, error solutions |
+| 🔴 Must save | Write to memory | 认证令牌s, IPs, config values, error solutions |
 | 🟡 Should save | Write to memory | Decision reasons, user preferences, task progress |
 | 🟢 Safe to discard | Mark as safe | Repeated ls output, already-summarized search results |
 
